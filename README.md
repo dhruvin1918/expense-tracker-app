@@ -23,32 +23,35 @@ A clean and user-friendly mobile app designed to track income, expenses, and bud
 
 ## 📷 Screenshots
 
-### 📊 Dashboard
-
+### 🔐 Login Page
 <p align="center">
-  <img src="ScreenShots/dashboard.png" width="300"/>
+  <img src="ScreenShorts/login_page.png" width="300"/>
+</p>
+
+### 📊 Home / Dashboard
+<p align="center">
+  <img src="ScreenShorts/Home_page.png" width="300"/>
 </p>
 
 ### ➕ Add Expense
-
 <p align="center">
-  <img src="ScreenShots/add_expense.png" width="300"/>
+  <img src="ScreenShorts/add_expense.png" width="300"/>
 </p>
 
-### 📈 Reports
-
+### 💰 Add Income
 <p align="center">
-  <img src="ScreenShots/reports.png" width="300"/>
+  <img src="ScreenShorts/add_income.png" width="300"/>
 </p>
 
 ### 📂 Categories
-
 <p align="center">
-  <img src="ScreenShots/category.png" width="300"/>
+  <img src="ScreenShorts/add_category.png" width="300"/>
 </p>
 
----
-
+### ⚙️ Settings
+<p align="center">
+  <img src="ScreenShorts/setting_page.png" width="300"/>
+</p>
 ## 🎥 Demo Video
 
 👉 (Add your demo video link here)
