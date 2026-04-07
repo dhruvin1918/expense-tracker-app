@@ -87,6 +87,7 @@ This project was built to demonstrate a real-world expense tracking solution wit
 ## 👨‍💻 Developed By
 
 **Dhruvin Parmar**
+
 PixelForgeX.dev
 
 ---
