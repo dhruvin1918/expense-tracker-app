@@ -1,66 +1,68 @@
 # 💰 Expense Tracker App
 
-A modern and smart expense tracking application built using Flutter & Firebase to manage daily finances efficiently.
+A modern expense tracking mobile application built using Flutter & Firebase to manage daily finances efficiently.
+
+<p align="center">
+  <img src="ScreenShorts/login_page.png" width="250"/>
+</p>
 
 ---
 
-## 🚀 Live Overview
+## 🚀 Quick Access
 
-A clean and user-friendly mobile app designed to track income, expenses, and budgets with real-time insights.
+👉 📦 APK Download: [Expense Tracker-v.1.0](https://drive.google.com/file/d/1jfyZIqly9d5ZI8BAGuW_Rg3jQWa_xOhq/view?usp=sharing)
+👉 🎥 Demo Video: https://your-video-link
 
 ---
 
 ## ✨ Features
 
+* 🔐 Google Authentication (Firebase)
 * ➕ Add Income & Expenses
-* 📂 Category-wise tracking
-* 📊 Daily / Monthly reports
-* 💰 Budget management
-* 🔔 Budget alerts
-* 🔥 Clean and modern UI
+* 📂 Category Management
+* 📊 Daily & Monthly Reports
+* 💰 Budget Tracking
+* ⚡ Smooth & Clean UI
 
 ---
 
 ## 📷 Screenshots
 
 ### 🔐 Login Page
+
 <p align="center">
   <img src="ScreenShorts/login_page.png" width="300"/>
 </p>
 
-### 📊 Home / Dashboard
+### 📊 Dashboard
+
 <p align="center">
   <img src="ScreenShorts/Home_page.png" width="300"/>
 </p>
 
 ### ➕ Add Expense
+
 <p align="center">
   <img src="ScreenShorts/add_expense.png" width="300"/>
 </p>
 
 ### 💰 Add Income
+
 <p align="center">
   <img src="ScreenShorts/add_income.png" width="300"/>
 </p>
 
 ### 📂 Categories
+
 <p align="center">
   <img src="ScreenShorts/add_category.png" width="300"/>
 </p>
 
 ### ⚙️ Settings
+
 <p align="center">
   <img src="ScreenShorts/setting_page.png" width="300"/>
 </p>
-## 🎥 Demo Video
-
-👉 (Add your demo video link here)
-
----
-
-## 📦 APK Download
-
-👉 [(Expense Tracker-v1.0)](https://drive.google.com/file/d/1jfyZIqly9d5ZI8BAGuW_Rg3jQWa_xOhq/view?usp=sharing)
 
 ---
 
@@ -68,7 +70,8 @@ A clean and user-friendly mobile app designed to track income, expenses, and bud
 
 * Flutter
 * Dart
-* Firebase
+* Firebase Authentication
+* Firebase Firestore
 
 ---
 
@@ -83,14 +86,13 @@ A clean and user-friendly mobile app designed to track income, expenses, and bud
 
 ## 🎯 Purpose
 
-This project was built to demonstrate a real-world expense tracking solution with clean UI and scalable architecture.
+This project demonstrates a real-world expense tracking solution with authentication, clean UI, and scalable architecture.
 
 ---
 
 ## 👨‍💻 Developed By
 
 **Dhruvin Parmar**
-
 PixelForgeX.dev
 
 ---
@@ -102,4 +104,4 @@ PixelForgeX.dev
 
 ---
 
-⭐ If you like this project, don’t forget to star the repo!
+⭐ If you like this project, consider giving it a star!
