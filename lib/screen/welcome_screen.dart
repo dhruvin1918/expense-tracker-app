@@ -15,14 +15,15 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   bool _isLoading = false;
-  
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       precacheImage(
-        const AssetImage('assets/images/login_background.png'),
+        const AssetImage(
+            'assets/images/login_background.png'),
         context,
       );
     });
@@ -74,7 +75,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         children: [
           const Spacer(),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 40),
             child: Column(
               children: [
                 Image.asset(
@@ -111,13 +113,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
           const Spacer(),
           Padding(
-            padding: const EdgeInsets.fromLTRB(40, 0, 40, 48),
+            padding:
+                const EdgeInsets.fromLTRB(40, 0, 40, 48),
             child: ElevatedButton.icon(
-              onPressed: _isLoading ? null : _signInWithGoogle,
+              onPressed:
+                  _isLoading ? null : _signInWithGoogle,
               style: ElevatedButton.styleFrom(
                 backgroundColor: colorScheme.primary,
                 foregroundColor: colorScheme.onPrimary,
-                minimumSize: const Size(double.infinity, 50),
+                minimumSize:
+                    const Size(double.infinity, 50),
               ),
               icon: _isLoading
                   ? SizedBox(
@@ -125,21 +130,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       height: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(
                           colorScheme.onPrimary,
                         ),
                       ),
                     )
                   : const FaIcon(FontAwesomeIcons.google),
               label: Text(
-                _isLoading ? 'Signing in...' : 'Continue with Google',
-                style: TextStyle(color: colorScheme.onPrimary),
+                _isLoading
+                    ? 'Signing in...'
+                    : 'Continue with Google',
+                style:
+                    TextStyle(color: colorScheme.onPrimary),
               ),
             ),
           ),
         ],
       ),
-      );
-    )
+    );
   }
 }
