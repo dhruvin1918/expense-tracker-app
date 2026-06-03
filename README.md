@@ -97,8 +97,7 @@ PixelForgeX.dev
 
 ## 📞 Contact
 
-* 📸 Instagram: @PixelForgeX.dev
-* 📧 Email: [pixelforgex.dev@gmail.com](mailto:pixelforgex.dev@gmail.com)
+* 📧 Email: [dhruvinparmar7641@gmail.com](mailto:dhruvinparmar7641@gmail.com)
 
 ---
 
