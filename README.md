@@ -6,7 +6,7 @@ A modern expense tracking mobile application built using Flutter & Firebase to m
 
 ## 🚀 Quick Access
 
-👉 📦 APK Download: [Expense Tracker-v1.0]([https://drive.google.com/file/d/1OuDsuuyQ_PH8O3RxIWdsB6On0ifL0gQx/view?usp=sharing])
+👉 📦 APK Download: [Expense Tracker-v1.0](https://drive.google.com/file/d/1OuDsuuyQ_PH8O3RxIWdsB6On0ifL0gQx/view?usp=sharing)
 
 ---
 
