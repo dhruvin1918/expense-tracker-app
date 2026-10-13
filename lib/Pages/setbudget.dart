@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 
 class SetBudgetPage extends StatefulWidget {
   final List<String> categories;
@@ -45,7 +46,7 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
 
     final docSnapshot = await FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .get();
 
     if (docSnapshot.exists) {
@@ -118,7 +119,7 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
 
       await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .set(
         {
           'monthlyBudget': monthlyBudget,

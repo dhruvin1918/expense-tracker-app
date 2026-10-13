@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:practice/firebase_options.dart';
 import 'package:practice/providers/theme_provider.dart';
 import 'package:practice/services/background_service.dart';
 import 'package:practice/services/notification_service.dart';
+import 'package:practice/services/user_data_migration_service.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 import 'package:practice/themes/theme.dart';
 import 'package:practice/widgets/wrapper.dart';
 import 'package:provider/provider.dart';
@@ -37,26 +41,9 @@ class _AppBootstrapState extends State<AppBootstrap> {
 
   Future<void> _initializeApp() async {
     try {
-      await dotenv.load(fileName: '.env');
-
-      if (kIsWeb) {
-        await Firebase.initializeApp(
-          options: FirebaseOptions(
-            apiKey: dotenv.env['FIREBASE_API_KEY']!,
-            authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN']!,
-            projectId: dotenv.env['FIREBASE_PROJECT_ID']!,
-            storageBucket:
-                dotenv.env['FIREBASE_STORAGE_BUCKET']!,
-            messagingSenderId:
-                dotenv.env['FIREBASE_MESSAGING_SENDER_ID']!,
-            appId: dotenv.env['FIREBASE_APP_ID']!,
-            measurementId:
-                dotenv.env['FIREBASE_MEASUREMENT_ID'],
-          ),
-        );
-      } else {
-        await Firebase.initializeApp();
-      }
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
 
       if (!kIsWeb) {
         FirebaseFirestore.instance.settings =
@@ -70,26 +57,50 @@ class _AppBootstrapState extends State<AppBootstrap> {
       _themeProvider = themeProvider;
 
       if (!kIsWeb) {
-        await NotificationService.initialize();
-        await NotificationService.requestPermission();
-        await BackgroundService
-            .requestBatteryOptimizationExemption();
-        await BackgroundService.initialize();
-
-        final prefs = await SharedPreferences.getInstance();
-        final alertEnabled =
-            prefs.getBool('budgetAlertEnabled') ?? false;
-        if (alertEnabled) {
-          final user = FirebaseAuth.instance.currentUser;
-          if (user != null) {
-            await BackgroundService.registerPeriodicTask(
-                user.uid);
-          }
-        }
+        unawaited(_initializeAndroidServices());
       }
     } catch (e) {
       _initError = e.toString();
       debugPrint('Firebase init failed: $e');
+    }
+  }
+
+  Future<void> _initializeAndroidServices() async {
+    try {
+      await NotificationService.initialize();
+      await NotificationService.requestPermission();
+      await BackgroundService
+          .requestBatteryOptimizationExemption();
+      await BackgroundService.initialize();
+
+      final prefs = await SharedPreferences.getInstance();
+      final alertEnabled =
+          prefs.getBool('budgetAlertEnabled') ?? false;
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        return;
+      }
+
+      try {
+        await UserDataMigrationService
+            .migrateSignedInUserData(user);
+      } catch (e) {
+        debugPrint(
+            'User migration skipped during startup: $e');
+      }
+
+      if (alertEnabled) {
+        try {
+          await BackgroundService.registerPeriodicTask(
+              userDocumentIdFor(user));
+        } catch (e) {
+          debugPrint(
+              'Background task registration skipped: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint(
+          'Non-critical Android startup step failed: $e');
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:practice/Pages/addincome.dart';
 import 'package:practice/Pages/setbudget.dart';
 import 'package:practice/Pages/wallet_detail_page.dart';
 import 'package:practice/Toggle/switchbutton.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -93,7 +94,7 @@ class _HomePageState extends State<MyHomePage> {
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('expenses')
           .where('date', isGreaterThanOrEqualTo: todayStart)
           .where('date', isLessThanOrEqualTo: todayEnd)
@@ -121,7 +122,7 @@ class _HomePageState extends State<MyHomePage> {
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('income')
           .where('date', isGreaterThanOrEqualTo: todayStart)
           .where('date', isLessThanOrEqualTo: todayEnd)
@@ -146,14 +147,14 @@ class _HomePageState extends State<MyHomePage> {
       final incomeSnapshot = await FirebaseFirestore
           .instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('income')
           .get();
 
       final expenseSnapshot = await FirebaseFirestore
           .instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('expenses')
           .get();
 
@@ -180,7 +181,7 @@ class _HomePageState extends State<MyHomePage> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('wallets')
           .get();
 
@@ -212,7 +213,7 @@ class _HomePageState extends State<MyHomePage> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('expenses')
           .where('date', isGreaterThanOrEqualTo: monthStart)
           .get();
@@ -235,7 +236,7 @@ class _HomePageState extends State<MyHomePage> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('expenses')
           .where('date', isGreaterThanOrEqualTo: monthStart)
           .get();
@@ -268,7 +269,7 @@ class _HomePageState extends State<MyHomePage> {
 
     final userDoc = await FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .get();
 
     final monthlyBudget =
@@ -380,7 +381,7 @@ class _HomePageState extends State<MyHomePage> {
     return StreamBuilder<QuerySnapshot>(
       stream: FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('categories')
           .orderBy('timestamp', descending: true)
           .snapshots(),
@@ -790,11 +791,12 @@ class _HomePageState extends State<MyHomePage> {
                   StreamBuilder<DocumentSnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('users')
-                        .doc(user.uid)
+                        .doc(userDocumentIdFor(user))
                         .snapshots(),
                     builder: (context, budgetSnapshot) {
-                      if (!budgetSnapshot.hasData)
+                      if (!budgetSnapshot.hasData) {
                         return const SizedBox();
+                      }
 
                       final monthlyBudget = _toDouble(
                           budgetSnapshot

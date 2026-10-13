@@ -2,7 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:practice/services/background_service.dart';
+import 'package:practice/services/user_data_migration_service.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 import 'package:practice/widgets/custom_scaffold.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -48,6 +52,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
       await FirebaseAuth.instance
           .signInWithCredential(credential);
+
+      final signedInUser =
+          FirebaseAuth.instance.currentUser;
+      if (signedInUser != null) {
+        await UserDataMigrationService
+            .migrateSignedInUserData(signedInUser);
+        final prefs = await SharedPreferences.getInstance();
+        final alertEnabled =
+            prefs.getBool('budgetAlertEnabled') ?? false;
+        if (alertEnabled) {
+          await BackgroundService.registerPeriodicTask(
+              userDocumentIdFor(signedInUser));
+        }
+      }
     } catch (e) {
       debugPrint('Google Sign-In error: $e');
       if (!mounted) return;

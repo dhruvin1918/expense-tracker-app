@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 
 class Addcategories extends StatefulWidget {
   const Addcategories({super.key});
@@ -40,7 +41,7 @@ class _AddcategoriesState extends State<Addcategories> {
     try {
       final categoriesRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('categories');
 
       final existing = await categoriesRef
@@ -129,7 +130,7 @@ class _AddcategoriesState extends State<Addcategories> {
     try {
       final categoryRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('categories')
           .doc(docId);
 
@@ -299,7 +300,7 @@ class _AddcategoriesState extends State<Addcategories> {
                   : StreamBuilder<QuerySnapshot>(
                       stream: FirebaseFirestore.instance
                           .collection('users')
-                          .doc(user.uid)
+                          .doc(userDocumentIdFor(user))
                           .collection('categories')
                           .orderBy('timestamp',
                               descending: true)

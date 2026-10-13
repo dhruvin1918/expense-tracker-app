@@ -2,7 +2,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:practice/services/user_firestore_helper.dart';
+
 import '../services/transaction_service.dart';
+
 class WalletDetailPage extends StatefulWidget {
   final String walletId;
   final String walletName;
@@ -15,6 +18,7 @@ class WalletDetailPage extends StatefulWidget {
   State<WalletDetailPage> createState() =>
       _WalletDetailPageState();
 }
+
 class _WalletDetailPageState
     extends State<WalletDetailPage> {
   String _filterType = 'All'; // All, Income, Expense
@@ -55,11 +59,13 @@ class _WalletDetailPageState
       ),
     );
   }
+
   // Calculate month start date
   DateTime _getMonthStart() {
     final now = DateTime.now();
     return DateTime(now.year, now.month, 1);
   }
+
   // Get category label
   String _getCategoryLabel(String description) {
     final desc = description.toLowerCase();
@@ -75,6 +81,7 @@ class _WalletDetailPageState
     }
     return 'Transfer';
   }
+
   void _showEditDialog(
       BuildContext context, Map<String, dynamic> tx) {
     final amountController = TextEditingController(
@@ -174,6 +181,7 @@ class _WalletDetailPageState
       },
     );
   }
+
   void _confirmDelete(
     BuildContext context,
     String transactionId,
@@ -222,6 +230,7 @@ class _WalletDetailPageState
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
@@ -233,7 +242,7 @@ class _WalletDetailPageState
     }
     final walletRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .collection('wallets')
         .doc(widget.walletId);
     return Scaffold(
@@ -267,9 +276,10 @@ class _WalletDetailPageState
               return StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('users')
-                    .doc(user.uid)
+                    .doc(userDocumentIdFor(user))
                     .collection('income')
-                    .where('wallet', isEqualTo: widget.walletId)
+                    .where('wallet',
+                        isEqualTo: widget.walletId)
                     .where('date',
                         isGreaterThanOrEqualTo:
                             Timestamp.fromDate(
@@ -279,7 +289,7 @@ class _WalletDetailPageState
                   return StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('users')
-                        .doc(user.uid)
+                        .doc(userDocumentIdFor(user))
                         .collection('expenses')
                         .where('wallet',
                             isEqualTo: widget.walletId)
@@ -292,15 +302,19 @@ class _WalletDetailPageState
                       double monthIncome = 0.0;
                       double monthExpense = 0.0;
                       if (incomeSnap.hasData) {
-                        for (var doc in incomeSnap.data!.docs) {
-                          monthIncome += (doc['amount'] as num)
-                              .toDouble();
+                        for (var doc
+                            in incomeSnap.data!.docs) {
+                          monthIncome +=
+                              (doc['amount'] as num)
+                                  .toDouble();
                         }
                       }
                       if (expenseSnap.hasData) {
-                        for (var doc in expenseSnap.data!.docs) {
-                          monthExpense += (doc['amount'] as num)
-                              .toDouble();
+                        for (var doc
+                            in expenseSnap.data!.docs) {
+                          monthExpense +=
+                              (doc['amount'] as num)
+                                  .toDouble();
                         }
                       }
                       return Padding(
@@ -313,20 +327,16 @@ class _WalletDetailPageState
                                 colorScheme.primary
                                     .withAlpha(220),
                               ],
-                              begin:
-                                  Alignment.topLeft,
-                              end: Alignment
-                                  .bottomRight,
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
                             borderRadius:
                                 BorderRadius.circular(16),
                           ),
-                          padding: const EdgeInsets
-                              .all(20),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
+                                CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Available Balance',
@@ -336,16 +346,12 @@ class _WalletDetailPageState
                                     .textTheme
                                     .bodySmall
                                     ?.copyWith(
-                                      color: Colors
-                                          .white
-                                          .withAlpha(
-                                              200),
-                                      letterSpacing:
-                                          0.5,
+                                      color: Colors.white
+                                          .withAlpha(200),
+                                      letterSpacing: 0.5,
                                     ),
                               ),
-                              const SizedBox(
-                                  height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 '₹${balance.toStringAsFixed(2)}',
                                 style: Theme.of(
@@ -355,14 +361,11 @@ class _WalletDetailPageState
                                     .headlineSmall
                                     ?.copyWith(
                                       fontWeight:
-                                          FontWeight
-                                              .bold,
-                                      color:
-                                          Colors.white,
+                                          FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                               ),
-                              const SizedBox(
-                                  height: 16),
+                              const SizedBox(height: 16),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment
@@ -375,24 +378,22 @@ class _WalletDetailPageState
                                     children: [
                                       Text(
                                         'This Month In',
-                                        style:
-                                            TextStyle(
+                                        style: TextStyle(
                                           color: Colors
                                               .white
                                               .withAlpha(
                                                   200),
-                                          fontSize:
-                                              12,
+                                          fontSize: 12,
                                         ),
                                       ),
                                       const SizedBox(
                                           height: 4),
                                       Text(
                                         '+₹${monthIncome.toStringAsFixed(0)}',
-                                        style: const TextStyle(
+                                        style:
+                                            const TextStyle(
                                           color:
-                                              Colors
-                                                  .white,
+                                              Colors.white,
                                           fontWeight:
                                               FontWeight
                                                   .bold,
@@ -407,23 +408,22 @@ class _WalletDetailPageState
                                     children: [
                                       Text(
                                         'This Month Out',
-                                        style:
-                                            TextStyle(
+                                        style: TextStyle(
                                           color: Colors
                                               .white
                                               .withAlpha(
                                                   200),
-                                          fontSize:
-                                              12,
+                                          fontSize: 12,
                                         ),
                                       ),
                                       const SizedBox(
                                           height: 4),
                                       Text(
                                         '-₹${monthExpense.toStringAsFixed(0)}',
-                                        style: const TextStyle(
-                                          color:
-                                              Color(0xFFFF6B6B),
+                                        style:
+                                            const TextStyle(
+                                          color: Color(
+                                              0xFFFF6B6B),
                                           fontWeight:
                                               FontWeight
                                                   .bold,
@@ -443,6 +443,7 @@ class _WalletDetailPageState
               );
             },
           ),
+
           /// 🔹 FILTER TABS
           Padding(
             padding: const EdgeInsets.symmetric(
@@ -452,34 +453,27 @@ class _WalletDetailPageState
               child: Row(
                 children: ['All', 'Income', 'Expense']
                     .map((filter) {
-                  final isSelected =
-                      _filterType == filter;
+                  final isSelected = _filterType == filter;
                   return Padding(
                     padding:
-                        const EdgeInsets.only(
-                            right: 8),
+                        const EdgeInsets.only(right: 8),
                     child: FilterChip(
                       label: Text(filter),
                       selected: isSelected,
                       onSelected: (selected) {
                         setState(
-                            () =>
-                                _filterType =
-                                    filter);
+                            () => _filterType = filter);
                       },
-                      backgroundColor:
-                          Colors.transparent,
+                      backgroundColor: Colors.transparent,
                       side: BorderSide(
                         color: isSelected
                             ? colorScheme.primary
-                            : colorScheme
-                                .outlineVariant,
+                            : colorScheme.outlineVariant,
                       ),
                       labelStyle: TextStyle(
                         color: isSelected
                             ? colorScheme.primary
-                            : colorScheme
-                                .onSurfaceVariant,
+                            : colorScheme.onSurfaceVariant,
                         fontWeight: isSelected
                             ? FontWeight.bold
                             : FontWeight.normal,
@@ -490,12 +484,13 @@ class _WalletDetailPageState
               ),
             ),
           ),
+
           /// 🔹 TRANSACTIONS LIST BY DATE
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('users')
-                  .doc(user.uid)
+                  .doc(userDocumentIdFor(user))
                   .collection('income')
                   .where('wallet',
                       isEqualTo: widget.walletId)
@@ -504,90 +499,68 @@ class _WalletDetailPageState
                 return StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('users')
-                      .doc(user.uid)
+                      .doc(userDocumentIdFor(user))
                       .collection('expenses')
                       .where('wallet',
-                          isEqualTo:
-                              widget.walletId)
+                          isEqualTo: widget.walletId)
                       .snapshots(),
-                  builder: (context,
-                      expenseSnap) {
+                  builder: (context, expenseSnap) {
                     if (!incomeSnap.hasData ||
                         !expenseSnap.hasData) {
                       return const Center(
-                        child:
-                            CircularProgressIndicator(),
+                        child: CircularProgressIndicator(),
                       );
                     }
-                    final List<Map<
-                        String,
-                        dynamic>> items = [
-                      ...incomeSnap.data!.docs
-                          .map((d) => {
-                                'id': d.id,
-                                'wallet': d['wallet'],
-                                'type': 'income',
-                                'amount': (d[
-                                        'amount'] as num)
-                                    .toDouble(),
-                                'description':
-                                    d['description'] ??
-                                        '',
-                                'date': (d['date']
-                                        as Timestamp)
-                                    .toDate(),
-                              }),
-                      ...expenseSnap.data!.docs
-                          .map((d) => {
-                                'id': d.id,
-                                'wallet': d['wallet'],
-                                'type': 'expense',
-                                'amount': (d[
-                                        'amount'] as num)
-                                    .toDouble(),
-                                'description':
-                                    d['description'] ??
-                                        '',
-                                'date': (d['date']
-                                        as Timestamp)
-                                    .toDate(),
-                              }),
+                    final List<Map<String, dynamic>> items =
+                        [
+                      ...incomeSnap.data!.docs.map((d) => {
+                            'id': d.id,
+                            'wallet': d['wallet'],
+                            'type': 'income',
+                            'amount': (d['amount'] as num)
+                                .toDouble(),
+                            'description':
+                                d['description'] ?? '',
+                            'date': (d['date'] as Timestamp)
+                                .toDate(),
+                          }),
+                      ...expenseSnap.data!.docs.map((d) => {
+                            'id': d.id,
+                            'wallet': d['wallet'],
+                            'type': 'expense',
+                            'amount': (d['amount'] as num)
+                                .toDouble(),
+                            'description':
+                                d['description'] ?? '',
+                            'date': (d['date'] as Timestamp)
+                                .toDate(),
+                          }),
                     ];
                     // Filter by type
-                    if (_filterType !=
-                        'All') {
+                    if (_filterType != 'All') {
                       items.retainWhere((item) =>
                           item['type']
                               .toString()
                               .toLowerCase() ==
-                          _filterType
-                              .toLowerCase());
+                          _filterType.toLowerCase());
                     }
                     items.sort((a, b) =>
-                        b['date']
-                            .compareTo(
-                                a['date']));
+                        b['date'].compareTo(a['date']));
                     if (items.isEmpty) {
                       return Center(
                         child: Column(
-                          mainAxisSize:
-                              MainAxisSize
-                                  .min,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons
-                                  .receipt_long_outlined,
+                              Icons.receipt_long_outlined,
                               size: 48,
-                              color: colorScheme
-                                  .outline,
+                              color: colorScheme.outline,
                             ),
-                            const SizedBox(
-                                height: 12),
+                            const SizedBox(height: 12),
                             Text(
                               'No transactions yet',
                               style: TextStyle(
-                                color: colorScheme
-                                    .outline,
+                                color: colorScheme.outline,
                               ),
                             ),
                           ],
@@ -596,71 +569,47 @@ class _WalletDetailPageState
                     }
                     // Group by date
                     final Map<String,
-                        List<Map<
-                            String,
-                            dynamic>>> grouped =
-                        {};
-                    for (var item
-                        in items) {
+                            List<Map<String, dynamic>>>
+                        grouped = {};
+                    for (var item in items) {
                       final dateKey =
-                          DateFormat(
-                                  'EEEE — MMM d, yyyy')
-                              .format(item[
-                                  'date']);
-                      if (!grouped
-                          .containsKey(
-                              dateKey)) {
-                        grouped[dateKey] =
-                            [];
+                          DateFormat('EEEE — MMM d, yyyy')
+                              .format(item['date']);
+                      if (!grouped.containsKey(dateKey)) {
+                        grouped[dateKey] = [];
                       }
-                      grouped[dateKey]!
-                          .add(item);
+                      grouped[dateKey]!.add(item);
                     }
                     return ListView(
-                      padding:
-                          const EdgeInsets
-                              .symmetric(
-                              horizontal: 16,
-                              vertical: 8),
-                      children: grouped
-                          .entries
-                          .map((entry) {
-                        final dateGroup =
-                            entry.key;
-                        final txList =
-                            entry.value;
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      children:
+                          grouped.entries.map((entry) {
+                        final dateGroup = entry.key;
+                        final txList = entry.value;
                         return Column(
                           crossAxisAlignment:
-                              CrossAxisAlignment
-                                  .start,
+                              CrossAxisAlignment.start,
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets
-                                      .only(
-                                      top: 16,
-                                      bottom: 12),
+                                  const EdgeInsets.only(
+                                      top: 16, bottom: 12),
                               child: Text(
-                                dateGroup
-                                    .toUpperCase(),
+                                dateGroup.toUpperCase(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight:
-                                      FontWeight
-                                          .w600,
+                                      FontWeight.w600,
                                   color:
-                                      colorScheme
-                                          .outline,
-                                  letterSpacing:
-                                      0.5,
+                                      colorScheme.outline,
+                                  letterSpacing: 0.5,
                                 ),
                               ),
                             ),
-                            ...txList.map(
-                                (tx) {
+                            ...txList.map((tx) {
                               final isIncome =
-                                  tx['type'] ==
-                                      'income';
+                                  tx['type'] == 'income';
                               return _buildTransactionCard(
                                 context,
                                 tx,
@@ -680,147 +629,100 @@ class _WalletDetailPageState
       ),
     );
   }
+
   Widget _buildTransactionCard(
     BuildContext context,
-    Map<String,
-        dynamic> tx,
+    Map<String, dynamic> tx,
     bool isIncome,
   ) {
-    final colorScheme =
-        Theme.of(context).colorScheme;
-    final category =
-        _getCategoryLabel(
-            tx['description']);
+    final colorScheme = Theme.of(context).colorScheme;
+    final category = _getCategoryLabel(tx['description']);
     return Container(
-      margin: const EdgeInsets.only(
-          bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isIncome
-            ? Colors.green
-                .withAlpha(20)
-            : Colors.red
-                .withAlpha(20),
+            ? Colors.green.withAlpha(20)
+            : Colors.red.withAlpha(20),
         border: Border.all(
           color: isIncome
-              ? Colors.green
-                  .withAlpha(100)
-              : Colors.red
-                  .withAlpha(100),
+              ? Colors.green.withAlpha(100)
+              : Colors.red.withAlpha(100),
           width: 0.5,
         ),
-        borderRadius:
-            BorderRadius.circular(
-                12),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
         onLongPress: () {
-          _showActionSheet(
-              context, tx);
+          _showActionSheet(context, tx);
         },
-        borderRadius:
-            BorderRadius.circular(
-                12),
+        borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding:
-              const EdgeInsets
-                  .all(12),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets
-                        .all(10),
-                decoration:
-                    BoxDecoration(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
                   color: isIncome
-                      ? Colors.green
-                          .withAlpha(
-                              50)
-                      : Colors.red
-                          .withAlpha(
-                              50),
-                  shape:
-                      BoxShape
-                          .circle,
+                      ? Colors.green.withAlpha(50)
+                      : Colors.red.withAlpha(50),
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isIncome
-                      ? Icons
-                          .arrow_downward
-                      : Icons
-                          .arrow_upward,
+                      ? Icons.arrow_downward
+                      : Icons.arrow_upward,
                   color: isIncome
-                      ? Colors.green
-                          .shade600
-                      : Colors.red
-                          .shade600,
+                      ? Colors.green.shade600
+                      : Colors.red.shade600,
                   size: 18,
                 ),
               ),
-              const SizedBox(
-                  width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment:
-                      CrossAxisAlignment
-                          .start,
+                      CrossAxisAlignment.start,
                   children: [
                     Text(
                       tx['description'],
                       style: Theme.of(
                         context,
-                      )
-                          .textTheme
-                          .bodyMedium
-                          ?.copyWith(
-                            fontWeight:
-                                FontWeight
-                                    .w600,
+                      ).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
                           ),
                       maxLines: 1,
-                      overflow:
-                          TextOverflow
-                              .ellipsis,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(
-                        height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       'Expense • $category',
                       style: TextStyle(
                         fontSize: 12,
-                        color: colorScheme
-                            .onSurfaceVariant,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
                 ),
               ),
               Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment
-                        .end,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     '${isIncome ? '+' : '-'}₹${tx['amount'].toStringAsFixed(0)}',
                     style: TextStyle(
-                      fontWeight:
-                          FontWeight
-                              .bold,
+                      fontWeight: FontWeight.bold,
                       color: isIncome
-                          ? Colors.green
-                              .shade600
-                          : Colors.red
-                              .shade600,
+                          ? Colors.green.shade600
+                          : Colors.red.shade600,
                     ),
                   ),
-                  const SizedBox(
-                      height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     'Bal ₹40,381',
                     style: TextStyle(
                       fontSize: 11,
-                      color: colorScheme
-                          .outline,
+                      color: colorScheme.outline,
                     ),
                   ),
                 ],

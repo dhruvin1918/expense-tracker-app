@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:practice/services/background_service.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Switchbutton extends StatefulWidget {
@@ -36,7 +37,7 @@ class _SwitchbuttonState extends State<Switchbutton> {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         await BackgroundService.registerPeriodicTask(
-            user.uid);
+            userDocumentIdFor(user));
       }
     } else {
       await BackgroundService.cancelAll();

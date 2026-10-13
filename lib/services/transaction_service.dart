@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import 'user_firestore_helper.dart';
+
 class TransactionService {
   // DELETE TRANSACTION
   static Future<void> deleteTransaction({
@@ -21,19 +23,19 @@ class TransactionService {
 
     final walletRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .collection('wallets')
         .doc(walletId);
 
     final transactionRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .collection(collection)
         .doc(transactionId);
 
     final auditRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .collection('transactions')
         .doc(transactionId);
 
@@ -42,8 +44,7 @@ class TransactionService {
           .runTransaction((tx) async {
         final walletSnap = await tx.get(walletRef);
         final currentBalance =
-          (walletSnap.data()?['balance'] ?? 0)
-            .toDouble();
+            (walletSnap.data()?['balance'] ?? 0).toDouble();
 
         if (type == 'income' && currentBalance < amount) {
           throw Exception(
@@ -86,19 +87,19 @@ class TransactionService {
 
     final walletRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .collection('wallets')
         .doc(walletId);
 
     final transactionRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .collection(collection)
         .doc(transactionId);
 
     final auditRef = FirebaseFirestore.instance
         .collection('users')
-        .doc(user.uid)
+        .doc(userDocumentIdFor(user))
         .collection('transactions')
         .doc(transactionId);
 
@@ -107,8 +108,7 @@ class TransactionService {
           .runTransaction((tx) async {
         final walletSnap = await tx.get(walletRef);
         final currentBalance =
-          (walletSnap.data()?['balance'] ?? 0)
-            .toDouble();
+            (walletSnap.data()?['balance'] ?? 0).toDouble();
 
         double updatedBalance;
         if (type == 'income') {

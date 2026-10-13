@@ -2,14 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import 'user_firestore_helper.dart';
+
 class ResetService {
   static Future<void> resetUserData() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
     final firestore = FirebaseFirestore.instance;
-    final userRef =
-        firestore.collection('users').doc(user.uid);
+    final userRef = userDocumentRef(user);
 
     // TODO: Chunk operations into groups of <=500 writes for large datasets.
     final batch = firestore.batch();

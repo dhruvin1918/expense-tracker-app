@@ -12,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
@@ -60,7 +61,7 @@ class _ReportPageState extends State<ReportPage> {
     try {
       final snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection(collection)
           .where('date', isGreaterThanOrEqualTo: startDate)
           .where('date', isLessThanOrEqualTo: endDate)

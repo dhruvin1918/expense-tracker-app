@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:practice/services/user_firestore_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Addincome extends StatefulWidget {
@@ -20,7 +21,13 @@ class _AddincomeState extends State<Addincome> {
   DateTime _selectedDate = DateTime.now();
   String _selectedWallet = 'cash';
   bool _isSaving = false;
-  final List<int> _quickAmounts = [100, 200, 500, 1000, 2000];
+  final List<int> _quickAmounts = [
+    100,
+    200,
+    500,
+    1000,
+    2000
+  ];
 
   @override
   void initState() {
@@ -37,7 +44,8 @@ class _AddincomeState extends State<Addincome> {
 
   void _presentDatePicker() async {
     final now = DateTime.now();
-    final firstDate = DateTime(now.year - 5, now.month, now.day);
+    final firstDate =
+        DateTime(now.year - 5, now.month, now.day);
 
     final pickedDate = await showDatePicker(
       context: context,
@@ -55,13 +63,16 @@ class _AddincomeState extends State<Addincome> {
     final prefs = await SharedPreferences.getInstance();
     if (!mounted) return;
     setState(() {
-      _selectedWallet = prefs.getString('default_income_wallet') ?? 'cash';
+      _selectedWallet =
+          prefs.getString('default_income_wallet') ??
+              'cash';
     });
   }
 
   Future<void> _saveDefaults() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('default_income_wallet', _selectedWallet);
+    await prefs.setString(
+        'default_income_wallet', _selectedWallet);
   }
 
   Future<void> _undoIncome({
@@ -71,16 +82,23 @@ class _AddincomeState extends State<Addincome> {
     required String incomeId,
     required String transactionId,
   }) async {
-    final userRef = FirebaseFirestore.instance.collection('users').doc(userId);
-    final walletRef = userRef.collection('wallets').doc(wallet);
-    final incomeRef = userRef.collection('income').doc(incomeId);
-    final transactionRef =
-        userRef.collection('transactions').doc(transactionId);
+    final userRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId);
+    final walletRef =
+        userRef.collection('wallets').doc(wallet);
+    final incomeRef =
+        userRef.collection('income').doc(incomeId);
+    final transactionRef = userRef
+        .collection('transactions')
+        .doc(transactionId);
 
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
+    await FirebaseFirestore.instance
+        .runTransaction((transaction) async {
       final walletSnap = await transaction.get(walletRef);
-      final currentBalance =
-          walletSnap.exists ? (walletSnap['balance'] ?? 0).toDouble() : 0.0;
+      final currentBalance = walletSnap.exists
+          ? (walletSnap['balance'] ?? 0).toDouble()
+          : 0.0;
 
       transaction.set(
         walletRef,
@@ -99,7 +117,9 @@ class _AddincomeState extends State<Addincome> {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please sign in before adding income.')),
+        const SnackBar(
+            content: Text(
+                'Please sign in before adding income.')),
       );
       return;
     }
@@ -110,25 +130,27 @@ class _AddincomeState extends State<Addincome> {
 
       final walletRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('wallets')
           .doc(_selectedWallet);
 
       final incomeRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('income')
           .doc();
 
       final transactionRef = FirebaseFirestore.instance
           .collection('users')
-          .doc(user.uid)
+          .doc(userDocumentIdFor(user))
           .collection('transactions')
           .doc();
 
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
+      await FirebaseFirestore.instance
+          .runTransaction((transaction) async {
         final walletSnap = await transaction.get(walletRef);
-        final currentBalance = (walletSnap.data()?['balance'] ?? 0).toDouble();
+        final currentBalance =
+            (walletSnap.data()?['balance'] ?? 0).toDouble();
 
         transaction.set(
           walletRef,
@@ -166,7 +188,7 @@ class _AddincomeState extends State<Addincome> {
             label: 'Undo',
             onPressed: () {
               _undoIncome(
-                userId: user.uid,
+                userId: userDocumentIdFor(user),
                 amount: amount,
                 wallet: _selectedWallet,
                 incomeId: incomeRef.id,
@@ -183,7 +205,8 @@ class _AddincomeState extends State<Addincome> {
       debugPrint('Income save error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Failed to save income. Please try again.'),
+          content: Text(
+              'Failed to save income. Please try again.'),
         ),
       );
     } finally {
@@ -202,7 +225,8 @@ class _AddincomeState extends State<Addincome> {
           SafeArea(
             bottom: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              padding:
+                  const EdgeInsets.fromLTRB(16, 8, 16, 24),
               child: Column(
                 children: [
                   Row(
@@ -213,11 +237,14 @@ class _AddincomeState extends State<Addincome> {
                           width: 36,
                           height: 36,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white
+                                .withValues(alpha: 0.2),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.arrow_back,
-                              color: Colors.white, size: 18),
+                          child: const Icon(
+                              Icons.arrow_back,
+                              color: Colors.white,
+                              size: 18),
                         ),
                       ),
                       const Expanded(
@@ -226,7 +253,8 @@ class _AddincomeState extends State<Addincome> {
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 17,
-                                fontWeight: FontWeight.w500)),
+                                fontWeight:
+                                    FontWeight.w500)),
                       ),
                       const SizedBox(width: 36),
                     ],
@@ -234,7 +262,9 @@ class _AddincomeState extends State<Addincome> {
                   const SizedBox(height: 20),
                   Text('Enter amount',
                       style: TextStyle(
-                          color: Colors.white.withOpacity(0.75), fontSize: 13)),
+                          color: Colors.white
+                              .withValues(alpha: 0.75),
+                          fontSize: 13)),
                   const SizedBox(height: 8),
                   Form(
                     key: _formKey,
@@ -260,15 +290,18 @@ class _AddincomeState extends State<Addincome> {
                             fontWeight: FontWeight.w400),
                         hintText: '0.00',
                         hintStyle: TextStyle(
-                            color: Colors.white.withOpacity(0.35),
+                            color: Colors.white
+                                .withValues(alpha: 0.35),
                             fontSize: 52,
                             fontWeight: FontWeight.bold),
                         border: InputBorder.none,
-                        errorStyle: const TextStyle(color: Colors.white),
+                        errorStyle: const TextStyle(
+                            color: Colors.white),
                       ),
                       validator: (value) {
                         if (value == null ||
-                            double.tryParse(value) == null ||
+                            double.tryParse(value) ==
+                                null ||
                             double.parse(value) <= 0) {
                           return 'Enter valid amount';
                         }
@@ -282,21 +315,32 @@ class _AddincomeState extends State<Addincome> {
                     children: _quickAmounts
                         .map((amt) => GestureDetector(
                               onTap: () => setState(() =>
-                                  _amountController.text = amt.toString()),
+                                  _amountController.text =
+                                      amt.toString()),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 7),
+                                padding: const EdgeInsets
+                                    .symmetric(
+                                    horizontal: 14,
+                                    vertical: 7),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.white
+                                      .withValues(
+                                          alpha: 0.2),
+                                  borderRadius:
+                                      BorderRadius.circular(
+                                          20),
                                   border: Border.all(
-                                      color: Colors.white.withOpacity(0.4)),
+                                      color: Colors.white
+                                          .withValues(
+                                              alpha: 0.4)),
                                 ),
                                 child: Text('₹$amt',
                                     style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 13,
-                                        fontWeight: FontWeight.w500)),
+                                        fontWeight:
+                                            FontWeight
+                                                .w500)),
                               ),
                             ))
                         .toList(),
@@ -321,32 +365,41 @@ class _AddincomeState extends State<Addincome> {
                     _FieldTile(
                       iconBg: const Color(0xFFE6F1FB),
                       iconColor: const Color(0xFF185FA5),
-                      icon: Icons.account_balance_wallet_outlined,
+                      icon: Icons
+                          .account_balance_wallet_outlined,
                       label: 'Wallet',
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: _selectedWallet,
                           dropdownColor: Colors.white,
                           style: const TextStyle(
-                              color: Colors.black87, fontSize: 15),
+                              color: Colors.black87,
+                              fontSize: 15),
                           iconEnabledColor: Colors.black54,
                           isExpanded: true,
                           items: const [
                             DropdownMenuItem(
                                 value: 'cash',
                                 child: Text('Cash',
-                                    style: TextStyle(color: Colors.black87))),
+                                    style: TextStyle(
+                                        color: Colors
+                                            .black87))),
                             DropdownMenuItem(
                                 value: 'bank',
                                 child: Text('Bank',
-                                    style: TextStyle(color: Colors.black87))),
+                                    style: TextStyle(
+                                        color: Colors
+                                            .black87))),
                             DropdownMenuItem(
                                 value: 'credit',
                                 child: Text('Credit Card',
-                                    style: TextStyle(color: Colors.black87))),
+                                    style: TextStyle(
+                                        color: Colors
+                                            .black87))),
                           ],
                           onChanged: (value) {
-                            setState(() => _selectedWallet = value!);
+                            setState(() =>
+                                _selectedWallet = value!);
                             _saveDefaults();
                           },
                         ),
@@ -360,13 +413,17 @@ class _AddincomeState extends State<Addincome> {
                         iconColor: const Color(0xFF3B6D11),
                         icon: Icons.calendar_today_outlined,
                         label: 'Date',
+                        trailing: const Icon(
+                            Icons.chevron_right,
+                            color: Colors.grey,
+                            size: 20),
                         child: Text(
-                          DateFormat('EEE, MMM d yyyy').format(_selectedDate),
+                          DateFormat('EEE, MMM d yyyy')
+                              .format(_selectedDate),
                           style: const TextStyle(
-                              fontSize: 15, color: Colors.black87),
+                              fontSize: 15,
+                              color: Colors.black87),
                         ),
-                        trailing: const Icon(Icons.chevron_right,
-                            color: Colors.grey, size: 20),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -379,10 +436,12 @@ class _AddincomeState extends State<Addincome> {
                         controller: _descriptionController,
                         maxLength: 100,
                         style: const TextStyle(
-                            color: Colors.black87, fontSize: 15),
+                            color: Colors.black87,
+                            fontSize: 15),
                         decoration: const InputDecoration(
                           hintText: 'Add a note...',
-                          hintStyle: TextStyle(color: Colors.black54),
+                          hintStyle: TextStyle(
+                              color: Colors.black54),
                           border: InputBorder.none,
                           counterText: '',
                           isDense: true,
@@ -394,13 +453,18 @@ class _AddincomeState extends State<Addincome> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isSaving ? null : _saveIncome,
+                        onPressed:
+                            _isSaving ? null : _saveIncome,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1FA36A),
+                          backgroundColor:
+                              const Color(0xFF1FA36A),
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding:
+                              const EdgeInsets.symmetric(
+                                  vertical: 16),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius:
+                                BorderRadius.circular(14),
                           ),
                           elevation: 0,
                         ),
@@ -408,12 +472,17 @@ class _AddincomeState extends State<Addincome> {
                             ? const SizedBox(
                                 width: 22,
                                 height: 22,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: Colors.white),
+                                child:
+                                    CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color:
+                                            Colors.white),
                               )
                             : const Text('Save Income',
                                 style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w600)),
+                                    fontSize: 16,
+                                    fontWeight:
+                                        FontWeight.w600)),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -448,7 +517,8 @@ class _FieldTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(
+          horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(14),
@@ -471,11 +541,13 @@ class _FieldTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style:
-                        TextStyle(fontSize: 11, color: Colors.grey.shade600)),
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade600)),
                 const SizedBox(height: 2),
                 DefaultTextStyle.merge(
-                  style: const TextStyle(color: Colors.black87),
+                  style: const TextStyle(
+                      color: Colors.black87),
                   child: child,
                 ),
               ],

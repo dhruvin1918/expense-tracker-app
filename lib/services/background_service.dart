@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../firebase_options.dart';
 import 'notification_service.dart';
 
 const budgetCheckTask = 'budgetCheckTask';
@@ -14,9 +14,10 @@ const budgetCheckTask = 'budgetCheckTask';
 void callbackDispatcher() {
   Workmanager().executeTask((taskName, inputData) async {
     try {
-      await dotenv.load(fileName: '.env');
       if (Firebase.apps.isEmpty) {
-        await Firebase.initializeApp();
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
       }
       await NotificationService.initialize();
 
