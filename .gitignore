@@ -46,6 +46,7 @@ app.*.map.json
 
 .vscode/
 *.lock
+!pubspec.lock
 
 # Environment files
 .env
