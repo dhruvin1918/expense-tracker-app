@@ -75,3 +75,8 @@ flutter:
     - assets/images/
     - assets/images/login_background.png
     - assets/images/logo.png
+
+
+    
+dependency_overrides:
+  archive: ^4.5.2
